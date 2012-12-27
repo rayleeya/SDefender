@@ -1,6 +1,7 @@
 package com.rayleeya.sdefender;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,14 +36,34 @@ public class SDUtils {
 		}
 	};
 	
-	public static List<File> getSubFiles(File src) {
-		File[] files = src.listFiles();
+	public static List<File> getSubFiles(File src, FilenameFilter filter) {
+		File[] files = filter == null ? src.listFiles() : src.listFiles(filter);
 		List<File> list = Arrays.asList(files);
 		return list;
 	}
 	
+	public static List<File> getSubFiles(File src) {
+		List<File> list = getSubFiles(src, (FilenameFilter)null);
+		return list;
+	}
+	
 	public static List<File> getSubFiles(File src, Comparator<File> comparator) {
-		List<File> list = getSubFiles(src, comparator);
+		List<File> list = getSubFiles(src, (FilenameFilter)null);
+		Collections.sort(list, comparator);
+		return list;
+	}
+	
+	public static List<File> getSubFiles(File src, Comparator<File> comparator, boolean showDotFile) {
+		FilenameFilter filter = null;
+		if (!showDotFile) {
+			filter = new FilenameFilter() {
+				@Override
+				public boolean accept(File dir, String filename) {
+					return !filename.startsWith(".");
+				}
+			};
+		}
+		List<File> list = getSubFiles(src, filter);
 		Collections.sort(list, comparator);
 		return list;
 	}

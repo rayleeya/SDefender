@@ -36,13 +36,18 @@ public class SDCleaner extends Handler {
 		int what = msg.what;
 		switch (what) {
 			case MSG_SCAN :
-				doScan();
+				Request r = (Request)msg.obj;
+				doScan(r);
 				break;
 			
 			case MSG_CLEAN :
 				doClean();
 				break;
 		}
+	}
+	
+	public static class Request {
+		public boolean mShowDotFile;
 	}
 	
 	private boolean isSecurity(File src) {
@@ -59,10 +64,12 @@ public class SDCleaner extends Handler {
 		return true;
 	}
 	
-	private void doScan() {
+	private void doScan(Request r) {
+		boolean showDotFile = r.mShowDotFile;
+		
 		File src = new File(SDConfig.PATH_SD);
 		if (!isSecurity(src)) return;
-		List<File> files = SDUtils.getSubFiles(src, SDUtils.COMPARATOR_ALPHABET);
+		List<File> files = SDUtils.getSubFiles(src, SDUtils.COMPARATOR_ALPHABET, showDotFile);
 		
 		Message msg = mTarget.obtainMessage(MSG_SCAN, files);
 		msg.sendToTarget();
